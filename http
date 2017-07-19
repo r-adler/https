@@ -4,19 +4,21 @@ import java.io.*;
 
 public class AutoHTTPS {
     
-    public static boolean isReachableHTTP(String host) {
+    public static boolean ping(String host) {
+        
+        if (host == null) return false;
         
         try {
             HttpURLConnection con = (HttpURLConnection) new URL(host).openConnection();
             con.setRequestMethod("HEAD");
             int responseCode = con.getResponseCode();
             return (200 <= responseCode && responseCode <= 399);
-        } catch (IOException exception) {
-            return false;
-        }
+        } 
+        
+        catch (IOException exception) { return false; }
     }
     
-
+    
     public static void main(String[] args) {
         
         // time it, for the sake of curiousity
@@ -24,21 +26,24 @@ public class AutoHTTPS {
         
         // read in file
         In in = new In(args[0]);
+        StdOut.println(args[0]);
         
-        // how many of the websites to test
+        // how many of the websites to test.
         int N = Integer.parseInt(args[1]);
         if (N < 1 || N > 1000000) {
             throw new IndexOutOfBoundsException("N must be between 1 "
                                                     + "and 1 million");
         }
         
-        StdOut.println(N + " items from " + args[0]);
+        StdOut.println("# of sites to test: " + N);
         
-        // connect on http
+        // right now it just tests http
         String site = new String();
+        
+        // print out anything that doesn't work
         for (int i = 0; i < N; i++) {
             site = in.readString().replaceFirst("^", "http://");
-            if (isReachableHTTP(site)) {
+            if (!ping(site)) {
                 StdOut.println(i + 1 + ": " + site);
             }
         }
@@ -47,4 +52,5 @@ public class AutoHTTPS {
         
         StdOut.println(time.elapsedTime() + " seconds");
     }
+    
 }
