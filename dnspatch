@@ -1,5 +1,3 @@
-
-
 import edu.princeton.cs.algs4.*;
 import java.net.*;
 import java.io.*;
@@ -7,18 +5,19 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class AutoHTTPS {
     
-    private static int b;
+    private static int nohttps; // sites that will not connect over https
+    private static int nodns;   // sites that have dns issues
     
-    //https://www.mkyong.com/java/java-httpurlconnection-follow-redirect-example/
     public static boolean redirect(String host) {
         
+        if (host == null) { return false; }
+        
         try {
-            
             String url = host;
             URL obj = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
             
-            conn.setConnectTimeout(1000);
+            conn.setConnectTimeout(3000);
             conn.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
             conn.addRequestProperty("User-Agent", "Mozilla");
             conn.addRequestProperty("Referer", "google.com");
@@ -36,9 +35,12 @@ public class AutoHTTPS {
             
             return (redirect);
             
-        } catch (Exception e) { StdOut.println("dns issues: " + host); }
+        } catch (Exception e) { 
+            StdOut.println("dns issues: " + host);
+            nodns++;
+            return true; // so that it doesn't do the second loop
+        }
         
-        return false;
     }
     
     public static boolean ping(String host) {
@@ -47,7 +49,7 @@ public class AutoHTTPS {
         
         try {
             HttpURLConnection con = (HttpURLConnection) new URL(host).openConnection();
-            con.setConnectTimeout(500);
+            con.setConnectTimeout(3000);
             con.setRequestMethod("HEAD");
             int responseCode = con.getResponseCode();
             
@@ -59,34 +61,39 @@ public class AutoHTTPS {
     
     public static void main(String[] args) {
         
-        Stopwatch time = new Stopwatch();
+        nohttps = 0; nodns = 0;
+        String site = new String();
         
-        // read in file
-        In in = new In(args[0]);
-        //StdOut.println(args[0]);
-        
-        // how many of the websites to test.
-        int N = Integer.parseInt(args[1]);
+        In in = new In(args[0]);             // read in file
+        int N = Integer.parseInt(args[1]);   // how many of the websites to test.
         if (N < 1 || N > 1000000) {
             throw new IndexOutOfBoundsException("N must be between 1 "
                                                     + "and 1 million");
         }
         
-        //StdOut.println("# of sites to test: " + N);
+        Stopwatch time = new Stopwatch();
         
-        String site = new String();
         for (int i = 0; i < N; i++) {
+            
             site = in.readString().replaceFirst("^", "http://");
-            if (!redirect(site)) { // if it doesn't automatically redirect to https...
-                if (!ping(site.replaceFirst("^http://", "https://"))) { // ...will it accept https at all?
-                    //StdOut.println(i + 1 + ": " + site);
-                    b++;
+            
+            // check if the site automatically redirects to https
+            if (!redirect(site)) {
+                //StdOut.println(i + 1 + ": " + site);
+                
+                // if the site does NOT automatically redirect to https,
+                // try to reach https directly
+                if (!ping(site.replaceFirst("^http://", "https://"))) {
+                    StdOut.println(i + 1 + ": " + site);
+                    nohttps++;
                 }
             }
         }
         
         StdOut.println(time.elapsedTime() + " seconds");
-        StdOut.println(b);
+        StdOut.println(nohttps + " of " + (N - nodns) + " sites "
+                           + "did not connect over https");
+        StdOut.println(nodns + " sites could not be reached");
         
     }
     
