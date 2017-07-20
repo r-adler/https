@@ -1,19 +1,8 @@
 /*************************************************************************
-  *  Compilation:  javac AutoHTTPS.java
-  *  Execution:    java AutoHTTPS input.txt N
-  *  Dependencies: StdIn.java, StdOut.java, Stopwatch.java, In.java
-  * 
-  *  Sample execution: java AutoHTTPS 1mil.txt 1000000
-  *  Output: [sites from the top 1 million that don't acccept https]
-  *
-  *  Reads URLs from a file and outputs the protocol (https vs http)
-  *  Eventually it will also hopefully output the web hosting service
   * 
   *  The redirect method is https://www.mkyong.com/java/java-httpurl
   *  connection-follow-redirect-example/ with some slight modifications
-  * 
-  *  RJK Adler
-  * 
+  *
   *************************************************************************/
 
 import edu.princeton.cs.algs4.*;
@@ -83,13 +72,9 @@ public class AutoHTTPS {
         String site = new String();
         
         In in = new In(args[0]);             // read in file
-        int N = Integer.parseInt(args[1]);   // how many of the websites to test.
-        if (N < 1 || N > 1000000) {
-            throw new IndexOutOfBoundsException("N must be between 1 "
-                                                    + "and 1 million");
-        }
+        int N = Integer.parseInt(args[1]);   // how many of the websites to test
         
-        Stopwatch time = new Stopwatch();
+        //Stopwatch time = new Stopwatch();
         
         for (int i = 0; i < N; i++) {
             
@@ -108,7 +93,7 @@ public class AutoHTTPS {
             }
         }
         
-        StdOut.println(time.elapsedTime() + " seconds");
+        //StdOut.println(time.elapsedTime() + " seconds");
         StdOut.println(nohttps + " of " + (N - nodns) + " sites "
                            + "did not connect over https");
         StdOut.println(nodns + " sites could not be reached");
