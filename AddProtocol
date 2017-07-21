@@ -1,0 +1,48 @@
+/*************************************************************************
+  *  Sample execution: 
+  *  Output: 
+  *  
+  *  Adds protocol (http or https) to the beginning of a url
+  * 
+  *************************************************************************/
+
+import edu.princeton.cs.algs4.*;
+import java.net.*;
+import java.io.*;
+import javax.net.ssl.HttpsURLConnection;
+
+public class AddProtocol {
+    
+    public static String AddHttp(String host) {
+        String url = host;
+        return host.replaceFirst("^", "http://");
+    }
+    
+    public static String AddHttps(String host) {
+        String url = host;
+        return host.replaceFirst("^", "https://");
+    }
+    
+    
+    
+    public static void main(String[] args) {
+        
+        String site = new String();
+        
+        In in = new In(args[0]);             // read in file
+        int N = Integer.parseInt(args[1]);
+        if (N < 1 || N > 1000000) {
+            throw new IndexOutOfBoundsException("N must be between 1 "
+                                                    + "and 1 million");
+        }
+        
+        Stopwatch time = new Stopwatch();
+        
+        for (int i = 0; i < N; i++) {
+            //StdOut.println(AddHttp(in.readString()));
+            StdOut.println(AddHttps(in.readString()));
+        }
+        
+    }
+    
+}
