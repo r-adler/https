@@ -2,7 +2,8 @@
   * 
   *  The redirect method is https://www.mkyong.com/java/java-httpurl
   *  connection-follow-redirect-example/ with some slight modifications
-  *
+  * 
+  * 
   *************************************************************************/
 
 import edu.princeton.cs.algs4.*;
@@ -24,7 +25,7 @@ public class AutoHTTPS {
             URL obj = new URL(url);
             HttpURLConnection conn = (HttpURLConnection) obj.openConnection();
             
-            conn.setConnectTimeout(3000);
+            conn.setConnectTimeout(3000); conn.setReadTimeout(3000);
             conn.addRequestProperty("Accept-Language", "en-US,en;q=0.8");
             conn.addRequestProperty("User-Agent", "Mozilla");
             conn.addRequestProperty("Referer", "google.com");
@@ -55,8 +56,10 @@ public class AutoHTTPS {
         if (host == null) { return false; }
         
         try {
-            HttpURLConnection con = (HttpURLConnection) new URL(host).openConnection();
-            con.setConnectTimeout(3000);
+            String url = host;
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setConnectTimeout(3000); con.setReadTimeout(3000);
             con.setRequestMethod("HEAD");
             int responseCode = con.getResponseCode();
             
@@ -73,16 +76,18 @@ public class AutoHTTPS {
         
         In in = new In(args[0]);             // read in file
         int N = Integer.parseInt(args[1]);   // how many of the websites to test
+        if (N < 1 || N > 1000000) {
+            throw new IndexOutOfBoundsException("N must be between 1 "
+                                                    + "and 1 million");
+        }
         
-        //Stopwatch time = new Stopwatch();
+        Stopwatch time = new Stopwatch();
         
-        for (int i = 0; i < N; i++) {
-            
-            site = in.readString().replaceFirst("^", "http://");
+        for (int i = 0; i < N; i++) {           
+            site = in.readString();
             
             // check if the site automatically redirects to https
             if (!redirect(site)) {
-                //StdOut.println(i + 1 + ": " + site);
                 
                 // if the site does NOT automatically redirect to https,
                 // try to reach https directly
@@ -93,7 +98,7 @@ public class AutoHTTPS {
             }
         }
         
-        //StdOut.println(time.elapsedTime() + " seconds");
+        StdOut.println(time.elapsedTime() + " seconds");
         StdOut.println(nohttps + " of " + (N - nodns) + " sites "
                            + "did not connect over https");
         StdOut.println(nodns + " sites could not be reached");
